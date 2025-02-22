@@ -1,5 +1,5 @@
 #pragma once
-#include "../../Headers/cpp20_http_client.hpp"
+#include "cpp20_http_client.hpp"
 #include <WinSock2.h>
 #include <WS2tcpip.h>
 
@@ -145,8 +145,38 @@ struct Socket {
 
 	}
 
-	void Send(std::string ips) {
-		//code later
+	void Send(std::string ips, std::string command) {
+		
+		std::vector<std::string> iplist{};
+		std::istringstream stream(ips);
+		std::string line{};
+
+		while (std::getline(stream, line)) {
+			iplist.push_back(line);
+		}
+
+		for (const std::string& ip : iplist) {
+
+			const char* cip = ip.c_str(); //holy shit c++ needs to learn that string is literally just const char* exept its more stable and integrate it into their shit.
+
+			struct sockaddr_in server;
+			server.sin_family = AF_INET;
+			server.sin_port = htons(42069);
+			server.sin_addr.s_addr = inet_addr(cip);
+
+			if (connect(sock, (struct sockaddr*)&server, sizeof(server)) < 0) {
+				std::cerr << "Connection failed to " << ip;
+			}
+			else {
+				const char* ccommand = command.c_str();
+				if (send(sock, ccommand, strlen(ccommand), 0) < 0) {
+					std::cerr << "Send failed to " << ip;
+				}
+				else { std::cout << "Command sent to ip " << ip; }
+			}
+
+		}
+
 	}
 
 	void Close() {
@@ -154,11 +184,3 @@ struct Socket {
 	}
 
 };
-
-namespace Command {
-
-	void Run(std::string command, std::string ips, Socket sock) {
-		//code later
-	}
-
-}
