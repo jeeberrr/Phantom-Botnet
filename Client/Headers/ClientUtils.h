@@ -2,6 +2,13 @@
 #include "cpp20_http_client.hpp"
 #include <WinSock2.h>
 #include <WS2tcpip.h>
+#include <sstream>
+#include <fstream>
+#include <chrono>
+#include <cstdlib>
+#include <vector>
+#include <iostream>
+
 
 std::string ApiConnect(std::string url) {
 
